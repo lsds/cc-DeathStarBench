@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: memcached-rate
+    intel.dsb.type: database
+  namespace: {{ namespace }}
+  name: memcached-rate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: memcached-rate
+      intel.dsb.type: database
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: memcached-rate
+        intel.dsb.type: database
+    spec:
+      containers:
+        - env:
+            - name: MEMCACHED_CACHE_SIZE
+              value: "128"
+            - name: MEMCACHED_THREADS
+              value: "2"
+          image: {{ docker_registry_url }}/{{ docker_user }}/memcached
+          name: memcached-rate
+          ports:
+            - containerPort: 11211
+          resources: {}
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: {{ registry_secret }}
+status: {}

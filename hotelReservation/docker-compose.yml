@@ -1,0 +1,398 @@
+version: "3"
+
+docker-registry: "${docker-registry}"
+services:
+  consul:
+    command: "consul agent -config-file=/config/server.hcl"
+    image: ${docker-registry}/cc-uservice-security/consul:0.1.12
+    networks:
+      - consul
+    ports:
+      - "${CONSUL_UI_PORT_STRING}"
+    volumes:
+      - ${CONSUL_CONFIG_DIR}/server.hcl:/config/server.hcl:ro
+      - ca:/tls-client
+
+ coordinator:
+    working_dir: /tmp/marblerun
+    image: ${docker-registry}/${DSB_CLI_IMAGE}
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "${DSB_CODE_DIR}/bin/coordinator_entrypoint.sh ${OPEN_ENCLAVE_PATH} ${USERVICE_RUNTIME}"
+    ports:
+      - "${MARBLERUN_CLIENT_PORT}"
+      - "${MARBLERUN_MESH_PORT}"
+    volumes:
+      - ./:/code/DeathStarBench/hotelReservation
+
+  frontend:
+    depends_on:
+      - consul
+      - geo
+      - profile
+      - rate
+      - recommendation
+      - reservation
+      - search
+      - user
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh frontend ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+      - /var/run/aesmd:/var/run/aesmd
+
+  geo:
+    depends_on:
+      - consul
+      - mongodb-geo
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh geo ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+
+  profile:
+    depends_on:
+      - consul
+      - mongodb-profile
+      - memcached-profile
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh profile ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+
+  rate:
+    depends_on:
+      - consul
+      - mongodb-rate
+      - memcached-rate
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh rate ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+
+  recommendation:
+    depends_on:
+      - consul
+      - mongodb-recommendation
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh recommendation ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+
+  reservation:
+    depends_on:
+      - consul
+      - mongodb-reservation
+      - memcached-reservation
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh reservation ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+
+  search:
+    depends_on:
+      - consul
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh search ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+
+  user:
+    depends_on:
+      - consul
+      - mongodb-user
+    devices:
+      - ${SGX_DRIVER_DEVICE_PATH}
+      - ${SGX_PROVISION_DEVICE_PATH}
+    entrypoint: "${DSB_CODE_DIR}/bin/docker_entrypoint.sh user ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    image: ${docker-registry}/${DSB_USERVICE_IMAGE}
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ca:/tls-client
+      - ./:/code/DeathStarBench/hotelReservation
+
+  memcached-profile:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh profile ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - MEMCACHED_CACHE_SIZE=128
+      - MEMCACHED_THREADS=2
+    image: ${docker-registry}/cc-uservice-security/memcached:0.2.2
+    logging:
+      options:
+        max-size: 50m
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/memcached_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ca:/tls-client
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+
+  memcached-rate:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh rate ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - MEMCACHED_CACHE_SIZE=128
+      - MEMCACHED_THREADS=2
+    image: ${docker-registry}/cc-uservice-security/memcached:0.2.2
+    logging:
+      options:
+        max-size: 50m
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/memcached_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ca:/tls-client
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+
+  memcached-reservation:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    privileged: true
+    entrypoint: "/work/docker_entrypoint.sh reservation ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - MEMCACHED_CACHE_SIZE=128
+      - MEMCACHED_THREADS=2
+    image: ${docker-registry}/cc-uservice-security/memcached:0.2.2
+    logging:
+      options:
+        max-size: 50m
+    networks:
+      - consul
+    volumes:
+      - ./bin/memcached_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ca:/tls-client
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+
+  mongodb-geo:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh geo ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+    image: ${docker-registry}/cc-uservice-security/mongo:0.2.2
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/mongo_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+      - ca:/tls-client
+      - geo:/data/db
+
+  mongodb-profile:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh profile ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+    image: ${docker-registry}/cc-uservice-security/mongo:0.2.2
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/mongo_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+      - ca:/tls-client
+      - profile:/data/db
+
+  mongodb-rate:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh rate ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+    image: ${docker-registry}/cc-uservice-security/mongo:0.2.2
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/mongo_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+      - ca:/tls-client
+      - rate:/data/db
+
+  mongodb-recommendation:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh recommendation ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+    image: ${docker-registry}/cc-uservice-security/mongo:0.2.2
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/mongo_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+      - ca:/tls-client
+      - recommendation:/data/db
+
+  mongodb-reservation:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh reservation ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+    image: ${docker-registry}/cc-uservice-security/mongo:0.2.2
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/mongo_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+      - ca:/tls-client
+      - reservation:/data/db
+
+  mongodb-user:
+    depends_on:
+      - consul
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    entrypoint: "/work/docker_entrypoint.sh user ${USERVICE_RUNTIME}"
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+    image: ${docker-registry}/cc-uservice-security/mongo:0.2.2
+    networks:
+      - consul
+    privileged: true
+    volumes:
+      - ./bin/mongo_docker_entrypoint.sh:/work/docker_entrypoint.sh:ro
+      - ${CONSUL_CONFIG_DIR}:/consul/config:ro
+      - ca:/tls-client
+      - user:/data/db
+
+  cli:
+    image: ${docker-registry}/${DSB_CLI_IMAGE}
+    working_dir: /code/DeathStarBench/hotelReservation
+    stdin_open: true
+    tty: true
+    privileged: true
+    environment:
+      - ENABLE_CONSUL=${ENABLE_CONSUL:-on}
+      - ENABLE_MARBLES=${ENABLE_MARBLES:-on}
+    volumes:
+      - ./:/code/DeathStarBench/hotelReservation
+      - ca:/tls-client
+    networks:
+      - consul
+
+volumes:
+  ca:
+  geo:
+  profile:
+  rate:
+  recommendation:
+  reservation:
+  user:
+
+networks:
+  consul:
+    driver: bridge

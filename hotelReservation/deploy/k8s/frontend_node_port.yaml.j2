@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-node-port
+  namespace: {{ namespace }}
+spec:
+  selector:
+    io.kompose.service: frontend
+  type: NodePort
+  ports:
+  - name: http
+    port: 5000
+    targetPort: 5000
+    protocol: TCP

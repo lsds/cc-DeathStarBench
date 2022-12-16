@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: rate
+    intel.dsb.type: microservice
+  namespace: {{ namespace }}
+  name: rate
+spec:
+  ports:
+    - name: "8084"
+      port: 8084
+      targetPort: 8084
+  selector:
+    io.kompose.service: rate
+    intel.dsb.type: microservice
+status:
+  loadBalancer: {}

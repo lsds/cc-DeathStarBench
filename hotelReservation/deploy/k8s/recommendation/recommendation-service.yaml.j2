@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: recommendation
+    intel.dsb.type: microservice
+  namespace: {{ namespace }}
+  name: recommendation
+spec:
+  ports:
+    - name: "8085"
+      port: 8085
+      targetPort: 8085
+  selector:
+    io.kompose.service: recommendation
+    intel.dsb.type: microservice
+status:
+  loadBalancer: {}

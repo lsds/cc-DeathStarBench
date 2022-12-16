@@ -1,0 +1,513 @@
+{
+    "//": "In packages, we include enclaves. In Marbles, mostly env variables",
+    "Packages": {
+        "frontend": {
+            "Debug": true,
+            "ProductID": 1,
+            "SecurityVersion": 1
+        },
+        "geo": {
+            "Debug": true,
+            "SecurityVersion": 1,
+            "ProductID": 1,
+            "SignerID": "7ae6819b3f679b08a8422209f929e98e85ee64265ff038acf8f1f749409bf2b7"
+        },
+        "profile": {
+            "Debug": true,
+            "UniqueID": "<replace with mrenclave obtained by `ego uniqueid hello`>"
+        },
+        "rate": {
+            "Debug": true,
+            "ProductID": 1,
+            "SecurityVersion": 1,
+            "UniqueID": "<replace with mrenclave obtained by `ego uniqueid hello`>"
+        },
+        "recommendation": {
+            "Debug": true,
+            "ProductID": 1,
+            "SecurityVersion": 1,
+            "UniqueID": "<replace with mrenclave obtained by `ego uniqueid hello`>"
+        },
+        "reservation": {
+            "Debug": true,
+            "ProductID": 1,
+            "SecurityVersion": 1,
+            "UniqueID": "< generate this automatically from python`>"
+        },
+        "search": {
+            "Debug": true,
+            "ProductID": 1,
+            "SecurityVersion": 1,
+            "UniqueID": "<replace with mrenclave obtained by `ego uniqueid hello`>"
+        },
+        "user": {
+            "Debug": true,
+            "ProductID": 1,
+            "SecurityVersion": 1,
+            "UniqueID": "<replace with mrenclave obtained by `ego uniqueid hello`>"
+        }
+    },
+    "Marbles": {
+        "frontend": {
+            "Package": "frontend",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation",
+                    "EDG_MARBLE_COORDINATOR_ADDR": "coordinator:2001"
+                }
+            },
+            "TLS": [
+				"frontend-tls"
+			]
+        },
+        "geo": {
+            "Package": "geo",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation"
+                }
+            },
+            "TLS": [
+				"geo-tls"
+			]
+        },
+        "profile": {
+            "Package": "profile",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation"
+                }
+            },
+            "TLS": [
+				"profile-tls"
+			]
+        },
+        "user": {
+            "Package": "user",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation"
+                }
+            },
+            "TLS": [
+				"user-tls"
+			]
+        },
+        "reservation": {
+            "Package": "reservation",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation"
+                }
+            },
+            "TLS": [
+				"reservation-tls"
+			]
+        },
+        "recommendation": {
+            "Package": "recommendation",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation"
+                }
+            },
+            "TLS": [
+				"recommendation-tls"
+			]
+        },
+        "rate": {
+            "Package": "rate",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation"
+                }
+            },
+            "TLS": [
+				"rate-tls"
+			]
+        },
+        "search": {
+            "Package": "search",
+            "Parameters": {
+                "Env": {
+                    "DSB_CODE_DIR": "/code/DeathStarBench/hotelReservation"
+                }
+            },
+            "TLS": [
+				"search-tls"
+			]
+        }
+    },
+    "Secrets": {
+		"frontendCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": true,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"frontend","user","recommendation", "profile", "rate", "reservation","search","geo"
+				]
+			}
+		},
+        "userCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": false,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"user"
+				]
+			}
+		},
+        "reservationCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": false,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"reservation"
+				]
+			}
+		},
+        "recommendationCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": false,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"recommendation"
+				]
+			}
+		},
+        "profileCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": false,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"profile"
+				]
+			}
+		},
+        "geoCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": false,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"geo"
+				]
+			}
+		},
+        "searchCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": false,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"search"
+				]
+			}
+		},
+        "rateCert": {
+			"Type": "cert-ecdsa",
+			"Size": 256,
+			"Shared": false,
+			"Cert": {
+				"DNSNames": [
+					"localhost",
+					"rate"
+				]
+			}
+		}
+    },
+    "TLS": {
+		"frontend-tls": {
+			"Outgoing": [
+                {
+					"Port": "8084",
+					"Addr": "rate"
+				},
+                {
+					"Port": "8082",
+					"Addr": "search"
+                },
+                {
+					"Port": "8086",
+					"Addr": "user"
+                },
+                {
+					"Port": "8081",
+					"Addr": "profile"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                },
+                {
+                "Port": "8085",
+                "Addr": "recommendation"
+                }
+			],
+			"Incoming": [
+
+			]
+		},
+        "user-tls": {
+			"Outgoing": [
+				{
+					"Port": "5000",
+					"Addr": "frontend"
+				},
+                {
+					"Port": "8084",
+					"Addr": "rate"
+				},
+                {
+					"Port": "8082",
+					"Addr": "search"
+                },
+                {
+					"Port": "8081",
+					"Addr": "profile"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                },
+                {
+                "Port": "8085",
+                "Addr": "recommendation"
+                }
+			],
+			"Incoming": [
+				{
+					"Port": "8086",
+					"Cert": "userCert",
+					"DisableClientAuth": true
+				}
+			]
+		},
+        "reservation-tls": {
+			"Outgoing": [
+				{
+					"Port": "5000",
+					"Addr": "frontend"
+				},
+                {
+					"Port": "8084",
+					"Addr": "rate"
+				},
+                {
+					"Port": "8082",
+					"Addr": "search"
+                },
+                {
+					"Port": "8086",
+					"Addr": "user"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                },
+                {
+                "Port": "8085",
+                "Addr": "recommendation"
+                }
+			],
+			"Incoming": [
+				{
+					"Port": "8087",
+					"Cert": "reservationCert",
+					"DisableClientAuth": true
+				}
+			]
+		},
+        "profile-tls": {
+			"Outgoing": [
+				{
+					"Port": "5000",
+					"Addr": "frontend"
+				},
+                {
+					"Port": "8084",
+					"Addr": "rate"
+				},
+                {
+					"Port": "8082",
+					"Addr": "search"
+                },
+                {
+					"Port": "8086",
+					"Addr": "user"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                },
+                {
+                "Port": "8085",
+                "Addr": "recommendation"
+                }
+			],
+			"Incoming": [
+				{
+					"Port": "8081",
+					"Cert": "profileCert",
+					"DisableClientAuth": true
+				}
+			]
+		},
+        "search-tls": {
+			"Outgoing": [
+				{
+					"Port": "5000",
+					"Addr": "frontend"
+				},
+                {
+					"Port": "8084",
+					"Addr": "rate"
+				},
+                {
+					"Port": "8086",
+					"Addr": "user"
+                },
+                {
+					"Port": "8081",
+					"Addr": "profile"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                },
+                {
+                "Port": "8085",
+                "Addr": "recommendation"
+                }
+			],
+			"Incoming": [
+				{
+					"Port": "8082",
+					"Cert": "searchCert",
+					"DisableClientAuth": true
+				}
+			]
+		},
+        "rate-tls": {
+			"Outgoing": [
+				{
+					"Port": "5000",
+					"Addr": "frontend"
+				},
+                {
+					"Port": "8082",
+					"Addr": "search"
+                },
+                {
+					"Port": "8086",
+					"Addr": "user"
+                },
+                {
+					"Port": "8081",
+					"Addr": "profile"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                },
+                {
+                "Port": "8085",
+                "Addr": "recommendation"
+                }
+			],
+			"Incoming": [
+				{
+					"Port": "8084",
+					"Cert": "rateCert",
+					"DisableClientAuth": true
+				}
+			]
+		},
+        "recommendation-tls": {
+			"Outgoing": [
+				{
+					"Port": "5000",
+					"Addr": "frontend"
+				},
+                {
+					"Port": "8084",
+					"Addr": "rate"
+				},
+                {
+					"Port": "8082",
+					"Addr": "search"
+                },
+                {
+					"Port": "8086",
+					"Addr": "user"
+                },
+                {
+					"Port": "8081",
+					"Addr": "profile"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                }
+			],
+			"Incoming": [
+				{
+					"Port": "8083",
+					"Cert": "recommendationCert",
+					"DisableClientAuth": true
+				}
+			]
+		},
+        "geo-tls": {
+			"Outgoing": [
+				{
+					"Port": "5000",
+					"Addr": "frontend"
+				},
+                {
+					"Port": "8084",
+					"Addr": "rate"
+				},
+                {
+					"Port": "8082",
+					"Addr": "search"
+                },
+                {
+					"Port": "8086",
+					"Addr": "user"
+                },
+                {
+					"Port": "8081",
+					"Addr": "profile"
+                },
+                {
+					"Port": "8087",
+					"Addr": "reservation"
+                },
+                {
+                "Port": "8085",
+                "Addr": "recommendation"
+                }
+			],
+			"Incoming": [
+				{
+					"Port": "8083",
+					"Cert": "geoCert",
+					"DisableClientAuth": true
+				}
+			]
+		}
+    }
+}

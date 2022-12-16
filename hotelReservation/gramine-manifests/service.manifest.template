@@ -1,0 +1,39 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "{{ entrypoint }}"
+loader.log_level = "{{ log_level }}"
+loader.argv0_override = "{{ entrypoint }}"
+
+loader.env.LD_LIBRARY_PATH = "/lib"
+loader.env.DSB_CODE_DIR = "/code/DeathStarBench/hotelReservation"
+loader.env.ENABLE_CONSUL = "{{ enable_consul }}"
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },.
+  { path = "{{ entrypoint }}", uri = "file:{{ entrypoint }}" },
+  { path= "/code/DeathStarBench/hotelReservation/config.json", uri = "file:/code/DeathStarBench/hotelReservation/config.json" },
+  { path = "/etc", uri = "file:/etc" },
+]
+
+sgx.nonpie_binary = true
+sgx.enclave_size = "1G"
+sgx.thread_num=128
+sgx.preheat_enclave = true
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ entrypoint }}",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:/code/DeathStarBench/hotelReservation/config.json",
+]
+
+sgx.allowed_files = [
+  "file:/etc/ethers",
+  "file:/etc/gai.conf",
+  "file:/etc/group",
+  "file:/etc/hosts",
+  "file:/etc/host.conf",
+  "file:/etc/localtime",
+  "file:/etc/nsswitch.conf",
+  "file:/etc/passwd",
+  "file:/etc/resolv.conf",
+]

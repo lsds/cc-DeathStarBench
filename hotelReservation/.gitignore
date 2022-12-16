@@ -1,0 +1,18 @@
+# Python virtual environments
+venv
+venv-bm
+
+# Docker image archives
+img-archive
+
+# Installed binaries
+deploy/bin
+
+# Ini-file for deployments
+dsb.ini
+
+# Templated deployment files
+templated
+
+# Kubernetes credentials
+*kubeconfig

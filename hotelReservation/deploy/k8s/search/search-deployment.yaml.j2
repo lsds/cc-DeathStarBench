@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: search
+    intel.dsb.type: microservice
+  namespace: {{ namespace }}
+  name: search
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: search
+      intel.dsb.type: microservice
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: search
+        intel.dsb.type: microservice
+    spec:
+      containers:
+        - args: ["search", "{{ runtime }}"]
+          command: ["{{ dsb_code_dir }}/bin/docker_entrypoint.sh"]
+          env:
+            - name: DSB_CODE_DIR
+              value: "{{ dsb_code_dir }}"
+            - name: ENABLE_CONSUL
+              value: "{{ enable_consul }}"
+          image: {{ docker_registry_url }}/{{ docker_user }}/dsb:{{ dsb_version }}
+          name: search
+          ports:
+            - containerPort: 8082
+          {% if resources is defined %}
+          {{ resources | to_nice_yaml(indent=2) | trim | indent(width=10) }}
+          {% endif %}
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: {{ registry_secret }}
+status: {}
