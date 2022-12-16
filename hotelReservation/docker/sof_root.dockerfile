@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     wget \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && python3 -m pipinstall --no-cache-dir "meson>=0.56" "toml>=0.10"
+    && python3 -m pip install --no-cache-dir "meson>=0.56" "toml>=0.10"
 
 # Build and install CMake
 ARG CMAKE_VERSION=3.23.2
@@ -78,10 +78,10 @@ RUN mkdir /opt/edgelessrt \
     && ninja install
 
 # Clone and install EGo
-ARG EGO_VERSION=v1.0.0
+ARG EGO_VERSION
 RUN . /opt/edgelessrt/share/openenclave/openenclaverc \
     && export PATH=$PATH:/usr/local/go/bin \
-    && git clone -b ${EGO_VERSION} https://github.com/edgelesssys/ego \
+    && git clone -b v${EGO_VERSION} https://github.com/edgelesssys/ego \
     && cd ego \
     && mkdir build \
     && cd build \
@@ -104,10 +104,8 @@ RUN curl -L https://func-e.io/install.sh | bash -s -- -b /usr/local/bin \
     && cp /root/.func-e/versions/${ENVOY_VERSION}/bin/envoy /usr/local/bin/envoy
 
 # Build and install Gramine
-# TODO: gramine adds a lot of fixes for sockets after the latest tag (1.2)
-# thus we clone from main. Pin to 1.3 whenever it is released
-ARG GRAMINE_VERSION=master
-RUN git clone -b ${GRAMINE_VERSION} https://github.com/gramineproject/gramine /tmp/gramine \
+ARG GRAMINE_VERSION
+RUN git clone -b v${GRAMINE_VERSION} https://github.com/gramineproject/gramine /tmp/gramine \
     && cd /tmp/gramine \
     && meson setup build/ --buildtype=release -Ddirect=enabled -Dsgx=enabled \
     && ninja -C build/ \

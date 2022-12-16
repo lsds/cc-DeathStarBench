@@ -45,7 +45,7 @@ ARG DSB_VERSION
 WORKDIR /code
 RUN git clone \
     -b v${DSB_VERSION} \
-    https://github.com/intel-sandbox/carlosse.DeathStarBench.git \
+    https://github.com/lsds/cc-DeathStarBench.git \
     DeathStarBench
 WORKDIR /code/DeathStarBench/hotelReservation
 

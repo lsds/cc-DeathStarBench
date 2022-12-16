@@ -3,11 +3,9 @@ from invoke import task
 from os.path import join
 from subprocess import run
 from tasks.env import (
-    DOCKER_REGISTRY_URL,
     DOCKER_ROOT,
     DOCKER_USER,
     PROJ_ROOT,
-    PROXY_ENV_VARS,
     get_version,
 )
 
@@ -53,12 +51,18 @@ def get_out_file_name_from_tag(tag):
 def build(ctx, target, version=None, nocache=False, push=False):
     """
     Build docker container.
-    Targets: 'base', 'consul', 'dsb', 'memcached', and 'mongo'
+    Targets: 'base', 'consul', 'dsb', 'memcached', 'mongo', and all
     """
     # consul_version = "1.13.1"
     # envoy_version = "1.23.1"
     consul_version = "1.12.3"
     envoy_version = "1.23.0"
+    gramine_version = "1.3.1"
+    ego_version = "1.0.0"
+    mongo_version = "6.0.3"
+
+    if "all" in target:
+        target = list(TARGET_2_FILE.keys())
 
     for t in target:
         _validate_target(t)
@@ -69,13 +73,18 @@ def build(ctx, target, version=None, nocache=False, push=False):
         elif t == "mongo" or t == "memcached" or t == "root":
             build_args["CONSUL_VERSION"] = consul_version
             build_args["ENVOY_VERSION"] = envoy_version
-            build_args["GRAMINE_VERSION"] = "1.2"
+            build_args["GRAMINE_VERSION"] = gramine_version
             if t == "memcached":
                 build_args["MEMCACHED_VERSION"] = "1.6.17"
             if t == "mongo":
-                build_args["MONGO_VERSION"] = "6.0.0"
+                build_args["MONGO_VERSION"] = mongo_version
         elif t == "consul":
             build_args["CONSUL_VERSION"] = consul_version
+        elif t == "root":
+            build_args["CONSUL_VERSION"] = consul_version
+            build_args["ENVOY_VERSION"] = envoy_version
+            build_args["EGO_VERSION"] = ego_version
+            build_args["GRAMINE_VERSION"] = gramine_version
         tag = get_tag_from_file_name(file_name)
         cmd = [
             "docker",
@@ -95,21 +104,15 @@ def build(ctx, target, version=None, nocache=False, push=False):
         ]
 
         # Set environemnt variables
-        env = PROXY_ENV_VARS
+        env = {}
         env["DOCKER_BUILDKIT"] = "1"
 
         cmd = " ".join(cmd)
         print(cmd)
         run(cmd, shell=True, check=True, env=env, cwd=PROJ_ROOT)
 
-        # Tag the image irrespective of wether we push or not
-        registry_tag = join(DOCKER_REGISTRY_URL, tag)
-        tag_cmd = "docker tag {} {}".format(tag, registry_tag)
-        print(tag_cmd)
-        run(tag_cmd, shell=True, check=True)
-
         if push:
-            push_image(registry_tag)
+            push_image(tag)
 
 
 def push_image(tag, extra_env=None):

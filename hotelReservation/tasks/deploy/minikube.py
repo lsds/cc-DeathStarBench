@@ -9,7 +9,6 @@ from tasks.deploy.utils.minikube import (
     MINIKUBE_KUBECONFIG_FILE,
     get_minikube_kubectl_cmd,
 )
-from tasks.env import DOCKER_REGISTRY_URL
 from subprocess import run
 
 
@@ -62,7 +61,6 @@ def start(ctx):
         # with the docker driver. The issue is tracked here:
         # https://github.com/kubernetes/minikube/issues/14789
         "--kubernetes-version=1.23.10",
-        "--insecure-registry {}".format(DOCKER_REGISTRY_URL),
         # TODO(carlosse): we may want to make the path to the SGX driver a
         # variable here (see #91)
         "--mount --mount-string /dev/sgx:/dev/sgx",

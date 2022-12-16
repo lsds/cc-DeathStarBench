@@ -35,7 +35,7 @@ ARG MONGO_VERSION
 COPY gramine-manifests/mongod.diff /mongod.diff
 RUN git clone --branch=r${MONGO_VERSION} --depth=1 https://github.com/mongodb/mongo /mongo/ \
     && cd /mongo/ \
-    && python3 -m pip install -r --no-cache-dir etc/pip/compile-requirements.txt \
+    && python3 -m pip install --no-cache-dir -r etc/pip/compile-requirements.txt \
     && git apply /mongod.diff \
     && python3 buildscripts/scons.py install-mongod --disable-warnings-as-errors \
         --use-system-pcre --use-system-snappy --use-system-stemmer --use-system-tcmalloc \
@@ -48,8 +48,7 @@ COPY --from=consul /bin/consul /usr/local/bin/consul
 COPY ./bin/mongo_docker_entrypoint.sh /work/docker_entrypoint.sh
 
 # Generate Gramine manifest
-COPY gramine-manifests/mongod.manifest.template \
-    /work/mongod.manifest.template
+COPY gramine-manifests/mongod.manifest.template /work/mongod.manifest.template
 WORKDIR /work
 # Template manifest
 RUN gramine-manifest \

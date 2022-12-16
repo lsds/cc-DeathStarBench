@@ -28,7 +28,7 @@ from tasks.deploy.utils.k8s import (
     wait_for_pods_by_ns,
 )
 from tasks.deploy.utils.minikube import get_minikube_cluster_ip
-from tasks.env import DOCKER_REGISTRY_URL, DOCKER_USER, get_version
+from tasks.env import DOCKER_USER, get_version
 from time import sleep
 
 
@@ -82,7 +82,6 @@ def _deploy_services(kind, runtime, enable_consul):
 
     # Second, deploy the databases, as they have no dependencies
     template_vars = {
-        "docker_registry_url": DOCKER_REGISTRY_URL,
         "docker_user": DOCKER_USER,
         "registry_secret": K8S_REGISTRY_SECRET_NAME,
         "namespace": k8s_namespace,
@@ -97,7 +96,6 @@ def _deploy_services(kind, runtime, enable_consul):
 
     # Third, deploy the microservices
     template_vars = {
-        "docker_registry_url": DOCKER_REGISTRY_URL,
         "docker_user": DOCKER_USER,
         "dsb_code_dir": "/code/DeathStarBench/hotelReservation",
         "registry_secret": K8S_REGISTRY_SECRET_NAME,

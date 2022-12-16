@@ -9,9 +9,7 @@ PROJ_ROOT = dirname(dirname(realpath(__file__)))
 DOCKER_CONFIG = expanduser("~/.docker/config.json")
 DOCKER_PROJ_ROOT = "/code/DeathStarBench/hotelReservation"
 DOCKER_ROOT = join(PROJ_ROOT, "docker")
-# TODO(open-source): update when we have the new image registry
-DOCKER_USER = "docker-registry-user"
-DOCKER_REGISTRY_URL = "docker-registr.url"
+DOCKER_USER = "ccdsb"
 
 # ----- Go variables ----
 
@@ -27,8 +25,7 @@ NATIVE_BUILD_DIR = join(BASE_BUILD_DIR, "native")
 
 # ---- Github variables ----
 
-# TODO(open-source): update when we have the new repo name
-GH_REPO_NAME = "project-name/repo-name"
+GH_REPO_NAME = "lsds/cc-DeathStarBench"
 GH_ROOT = dirname(PROJ_ROOT)
 # TODO(open-source): generate a new github token for the new repository
 GH_TOKEN_PATH = join(PROJ_ROOT, "dev", "new_token_path")

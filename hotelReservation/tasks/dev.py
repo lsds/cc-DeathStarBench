@@ -12,7 +12,6 @@ from tasks.env import (
     GO_CMD_DIR,
     NATIVE_BUILD_DIR,
     PROJ_ROOT,
-    PROXY_ENV_VARS,
 )
 from tasks.utils.ego import sign as ego_sign
 from tasks.utils.gramine import sign as gramine_sign
@@ -54,7 +53,6 @@ def build(ctx, runtime="native", clean=False):
     # Include proxy env. vars in case we need to fetch any dependency from the
     # internet
     shell_env = copy(environ)
-    shell_env.update(PROXY_ENV_VARS)
 
     build_kinds = []
     if runtime in ["all", "native"]:
@@ -108,7 +106,6 @@ def format(ctx, check=False):
     # Include shell environment for out-of-tree builds to find the right go
     # binary
     shell_env = copy(environ)
-    shell_env.update(PROXY_ENV_VARS)
 
     if check:
         go_cmd = 'gofmt -l $(find . -type f -name "*.go")'
